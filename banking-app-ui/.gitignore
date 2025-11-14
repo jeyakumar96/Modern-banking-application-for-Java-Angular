@@ -1,42 +1,32 @@
-# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# =========================
+# Angular / Node Gitignore
+# =========================
 
-# Compiled output
-/dist
-/tmp
-/out-tsc
-/bazel-out
+# Angular build outputs
+dist/
+.angular/
+.angular/cache/
 
-# Node
-/node_modules
-npm-debug.log
-yarn-error.log
+# Node modules
+node_modules/
 
-# IDEs and editors
-.idea/
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# Visual Studio Code
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-.history/*
+# Package manager store
+.pnpm-store/
+.yarn/
 
-# Miscellaneous
-/.angular/cache
-.sass-cache/
-/connect.lock
-/coverage
-/libpeerconnection.log
-testem.log
-/typings
+# Environment files (if storing secrets)
+# src/environments/*.local.ts
 
-# System files
+# Archives
+*.tgz
+
+# OS files
 .DS_Store
 Thumbs.db
+desktop.ini

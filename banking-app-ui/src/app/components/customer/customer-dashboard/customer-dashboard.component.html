@@ -1,0 +1,262 @@
+<div class="customer-container">
+  <header class="header">
+    <div class="header-content">
+      <h1>KANINI BANK - Customer Portal</h1>
+      <div class="header-actions">
+        <span class="user-info"
+          >Welcome, {{ authService.getCurrentUser()?.fullName }}</span
+        >
+        <button class="btn btn-secondary" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="accounts-section">
+      <h2>My Accounts</h2>
+      <div class="accounts-grid">
+        <div
+          *ngFor="let account of accounts"
+          class="account-card"
+          [class.selected]="selectedAccount?.id === account.id"
+          (click)="selectAccount(account)"
+        >
+          <div class="account-type">{{ account.accountType }}</div>
+          <div class="account-number">{{ account.accountNumber }}</div>
+          <div class="account-balance">
+            <span class="label">Balance</span>
+            <span class="amount"
+              >₹{{ account.balance | number : "1.2-2" }}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions-section" *ngIf="selectedAccount">
+      <h2>Quick Actions</h2>
+      <div class="action-buttons">
+        <button class="btn btn-success" (click)="openDepositModal()">
+          <span>💳</span> Deposit
+        </button>
+        <button class="btn btn-warning" (click)="openWithdrawModal()">
+          <span>💸</span> Withdraw
+        </button>
+        <button class="btn btn-primary" (click)="openTransferModal()">
+          <span>🔄</span> Transfer
+        </button>
+      </div>
+    </div>
+
+    <div class="transactions-section" *ngIf="selectedAccount">
+      <h2>Recent Transactions</h2>
+      <div class="transactions-list">
+        <div *ngFor="let transaction of transactions" class="transaction-item">
+          <div
+            class="transaction-icon"
+            [ngClass]="transaction.type.toLowerCase()"
+          >
+            <span *ngIf="transaction.type === 'DEPOSIT'">↓</span>
+            <span *ngIf="transaction.type === 'WITHDRAWAL'">↑</span>
+            <span *ngIf="transaction.type === 'TRANSFER_IN'">←</span>
+            <span *ngIf="transaction.type === 'TRANSFER_OUT'">→</span>
+          </div>
+          <div class="transaction-details">
+            <div class="transaction-type">
+              {{ transaction.type.replace("_", " ") }}
+            </div>
+            <div class="transaction-date">
+              {{ transaction.transactionDate | date : "short" }}
+            </div>
+            <div class="transaction-description">
+              {{ transaction.description }}
+            </div>
+          </div>
+          <div
+            class="transaction-amount"
+            [ngClass]="transaction.type.toLowerCase()"
+          >
+            <span
+              *ngIf="
+                transaction.type === 'DEPOSIT' ||
+                transaction.type === 'TRANSFER_IN'
+              "
+              >+</span
+            >
+            <span
+              *ngIf="
+                transaction.type === 'WITHDRAWAL' ||
+                transaction.type === 'TRANSFER_OUT'
+              "
+              >-</span
+            >
+            ₹{{ transaction.amount | number : "1.2-2" }}
+          </div>
+        </div>
+        <div *ngIf="transactions.length === 0" class="no-transactions">
+          No transactions yet
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Deposit Modal -->
+<div class="modal" *ngIf="showDepositModal">
+  <div class="modal-content">
+    <h2>Deposit Money</h2>
+    <form (ngSubmit)="deposit()">
+      <div class="form-group">
+        <label>Account Number</label>
+        <input
+          type="text"
+          [(ngModel)]="transactionForm.accountNumber"
+          name="accountNumber"
+          readonly
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label>Amount</label>
+        <input
+          type="number"
+          [(ngModel)]="transactionForm.amount"
+          name="amount"
+          required
+          min="0.01"
+          step="0.01"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label>Description (Optional)</label>
+        <input
+          type="text"
+          [(ngModel)]="transactionForm.description"
+          name="description"
+          class="form-control"
+        />
+      </div>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-success">Deposit</button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeDepositModal()"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Withdraw Modal -->
+<div class="modal" *ngIf="showWithdrawModal">
+  <div class="modal-content">
+    <h2>Withdraw Money</h2>
+    <form (ngSubmit)="withdraw()">
+      <div class="form-group">
+        <label>Account Number</label>
+        <input
+          type="text"
+          [(ngModel)]="transactionForm.accountNumber"
+          name="accountNumber"
+          readonly
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label>Amount</label>
+        <input
+          type="number"
+          [(ngModel)]="transactionForm.amount"
+          name="amount"
+          required
+          min="0.01"
+          step="0.01"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label>Description (Optional)</label>
+        <input
+          type="text"
+          [(ngModel)]="transactionForm.description"
+          name="description"
+          class="form-control"
+        />
+      </div>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-warning">Withdraw</button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeWithdrawModal()"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Transfer Modal -->
+<div class="modal" *ngIf="showTransferModal">
+  <div class="modal-content">
+    <h2>Transfer Money</h2>
+    <form (ngSubmit)="transfer()">
+      <div class="form-group">
+        <label>From Account</label>
+        <input
+          type="text"
+          [(ngModel)]="transactionForm.accountNumber"
+          name="accountNumber"
+          readonly
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label>To Account Number</label>
+        <input
+          type="text"
+          [(ngModel)]="transactionForm.toAccountNumber"
+          name="toAccountNumber"
+          required
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label>Amount</label>
+        <input
+          type="number"
+          [(ngModel)]="transactionForm.amount"
+          name="amount"
+          required
+          min="0.01"
+          step="0.01"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label>Description (Optional)</label>
+        <input
+          type="text"
+          [(ngModel)]="transactionForm.description"
+          name="description"
+          class="form-control"
+        />
+      </div>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary">Transfer</button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeTransferModal()"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

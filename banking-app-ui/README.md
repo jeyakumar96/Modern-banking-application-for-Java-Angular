@@ -1,59 +1,259 @@
-# BankingAppUi
+# SBI Banking Application
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.18.
+A full-stack banking application built with Spring Boot 3.5.7 (Java 21) backend and Angular 19 frontend.
 
-## Development server
+## Features
 
-To start a local development server, run:
+### Admin Features (Bank Manager)
 
-```bash
-ng serve
+- View comprehensive dashboard with banking statistics
+  - Total customers, accounts, deposits
+  - Transaction metrics and volumes
+- Create new customer accounts
+- Generate account numbers for customers
+- Process deposits and withdrawals via bank/ATM
+- View all customers and accounts
+- Role-based access control
+
+### Customer Features
+
+- Secure login with JWT authentication
+- View multiple accounts (Savings/Current)
+- Deposit money
+- Withdraw money
+- Transfer money between accounts
+- View transaction history
+- Real-time balance updates
+
+## Technology Stack
+
+### Backend
+
+- Spring Boot 3.5.7
+- Java 21
+- Maven
+- Spring Data JPA
+- Spring Security with JWT
+- MySQL Database
+- Lombok
+
+### Frontend
+
+- Angular 19
+- TypeScript
+- SCSS
+- Standalone Components
+- Reactive Forms
+- HTTP Client
+
+## Prerequisites
+
+- Java 21 or higher
+- Maven 3.8+
+- Node.js 18+ and npm
+- MySQL 8.0+
+- Angular CLI 19
+
+## Database Setup
+
+1. Create MySQL database:
+
+```sql
+CREATE DATABASE bankingdb;
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+2. The application will auto-create tables on startup (ddl-auto=update)
 
-## Code scaffolding
+3. Default admin user will be created automatically:
+   - Username: `admin`
+   - Password: `admin123`
+   - Email: admin@sbi.com
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Backend Setup
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+1. Navigate to backend directory:
 
 ```bash
-ng build
+cd backend
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+2. Update MySQL credentials in `src/main/resources/application.properties` if needed:
 
-## Running unit tests
+```properties
+spring.datasource.username=root
+spring.datasource.password=Admin@123
+```
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+3. Build and run the application:
 
 ```bash
-ng test
+mvn clean install
+mvn spring-boot:run
 ```
 
-## Running end-to-end tests
+The backend will start on `http://localhost:8080`
 
-For end-to-end (e2e) testing, run:
+## Frontend Setup
+
+1. Navigate to frontend directory:
 
 ```bash
-ng e2e
+cd frontend
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+2. Install dependencies:
 
-## Additional Resources
+```bash
+npm install
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+3. Start the development server:
+
+```bash
+npm start
+```
+
+The frontend will start on `http://localhost:4200`
+
+## Default Login Credentials
+
+### Admin (Bank Manager)
+
+- Username: `admin`
+- Password: `admin123`
+
+### Customer
+
+After admin creates a customer account, customers can log in with their credentials.
+
+## API Endpoints
+
+### Authentication
+
+- POST `/api/auth/login` - User login
+- POST `/api/auth/register` - Customer registration
+
+### Admin Endpoints (Requires ADMIN role)
+
+- GET `/api/admin/dashboard/stats` - Get dashboard statistics
+- GET `/api/admin/customers` - Get all customers
+- POST `/api/admin/customers/register` - Create new customer
+- POST `/api/admin/accounts` - Create new account
+- GET `/api/admin/accounts` - Get all accounts
+- POST `/api/admin/transactions/deposit` - Process deposit
+- POST `/api/admin/transactions/withdraw` - Process withdrawal
+
+### Customer Endpoints (Requires CUSTOMER role)
+
+- GET `/api/customer/accounts` - Get my accounts
+- POST `/api/customer/transactions/deposit` - Deposit money
+- POST `/api/customer/transactions/withdraw` - Withdraw money
+- POST `/api/customer/transactions/transfer` - Transfer money
+- GET `/api/customer/transactions/{accountNumber}` - Get transactions
+
+## Project Structure
+
+```
+Banking/
+├── backend/
+│   ├── src/main/java/com/sbi/banking/
+│   │   ├── config/           # Security and app configuration
+│   │   ├── controller/       # REST controllers
+│   │   ├── dto/              # Data Transfer Objects
+│   │   ├── entity/           # JPA entities
+│   │   ├── repository/       # JPA repositories
+│   │   ├── security/         # JWT and security classes
+│   │   └── service/          # Business logic services
+│   └── src/main/resources/
+│       └── application.properties
+├── frontend/
+│   └── src/app/
+│       ├── components/       # Angular components
+│       │   ├── admin/        # Admin components
+│       │   ├── customer/     # Customer components
+│       │   ├── login/        # Login component
+│       │   └── register/     # Register component
+│       ├── guards/           # Route guards
+│       ├── interceptors/     # HTTP interceptors
+│       ├── models/           # TypeScript interfaces
+│       └── services/         # API services
+```
+
+## Security
+
+- JWT-based stateless authentication
+- Password encryption using BCrypt
+- Role-based access control (ADMIN, CUSTOMER)
+- HTTP-only token storage
+- CORS configuration for frontend-backend communication
+
+## Features Implemented
+
+✅ User authentication with JWT
+✅ Role-based authorization
+✅ Admin dashboard with statistics
+✅ Customer management
+✅ Account creation with auto-generated account numbers
+✅ Deposit/Withdraw operations
+✅ Fund transfer between accounts
+✅ Transaction history
+✅ Real-time balance updates
+✅ Responsive UI design
+✅ Form validations
+✅ Error handling
+
+## Additional Notes
+
+- Account numbers are auto-generated with format: SBI + 10 digits
+- Transaction IDs are auto-generated with format: TXN + 12 characters
+- All monetary values support 2 decimal precision
+- Transactions are recorded with before/after balances for audit trail
+- The application uses Angular 19's standalone components architecture
+
+## Development
+
+### Backend Development
+
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+### Frontend Development
+
+```bash
+cd frontend
+npm start
+```
+
+### Building for Production
+
+Backend:
+
+```bash
+cd backend
+mvn clean package
+java -jar target/banking-app-1.0.0.jar
+```
+
+Frontend:
+
+```bash
+cd frontend
+npm run build
+```
+
+## Troubleshooting
+
+1. **Port already in use**: Change port in `application.properties` (backend) or `angular.json` (frontend)
+2. **Database connection error**: Verify MySQL is running and credentials are correct
+3. **CORS errors**: Ensure backend CORS configuration matches frontend URL
+4. **JWT token expired**: Login again to get a new token
+
+## License
+
+This project is for educational purposes.
+
+## Contact
+
+For issues and questions, please create an issue in the repository.
